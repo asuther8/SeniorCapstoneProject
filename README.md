@@ -8,7 +8,15 @@
         https://mern.js.org
         
     
-       
-    To run the back end us command npm run app 
-    http://localhost:8082 
-    
+    To run the back end run the following command in the main folder:
+    npm run app
+
+    Backend runs on:
+    http://localhost:8082
+
+
+    Frontend is located in "client", run the following command there to start:
+    npm run start
+
+    Frontend runs on:
+    http://localhost:3000
