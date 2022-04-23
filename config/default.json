@@ -1,7 +1,10 @@
 {
-    "mongoURIAlex":
-        "mongodb+srv://cluster0.6sacz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
     "mongoURI":
-        "mongodb+srv://cluster1:cluster1@cluster0.1zglh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+        "mongodb+srv://admin:admin@cluster0.6sacz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority&authSource=admin",
+
+    "mongoURIAnthony":
+        "mongodb+srv://cluster1:cluster1@cluster0.1zglh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+
+    "database": "diabeasy"
 }
 

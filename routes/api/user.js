@@ -21,9 +21,9 @@ router.get('/', (req, res) => {
 // @description Get single user by id
 // @access Public
 router.get('/:id', (req, res) => {
-  Book.findById(req.params.id)
-    .then(user => res.json(user))
-    .catch(err => res.status(404).json({ nouserfound: 'No User found' }));
+  //Book.findById(req.params.id)
+  //  .then(user => res.json(user))
+  //  .catch(err => res.status(404).json({ nouserfound: 'No User found' }));
 });
 
 // @route GET api/users

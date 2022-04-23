@@ -12,30 +12,40 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [data, setData] = useState(null);
 
   function validateForm() {
     return (username.length > 0 && password.length > 0) && (password === passwordConfirm);
   }
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.post("/api/")
-    let result = await fetch(
-    'http://localhost:8082/api/user', {
+    console.log('Username is  ' + username);
+    console.log('Password is ' + password);
+    const result = await fetch(
+    'http://localhost:8082/register', {
         method: "post",
         body: JSON.stringify({ username, password }),
         headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
-    })
-    result = await result.json();
-    console.warn(result);
-    if (result) {
-        alert("Data saved successfully");
-        setUsername("");
-        setPassword("");
-    }
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw response;
+    }).then(data => {
+        if (data === false) {
+            alert("Username already in use");
+        }
+        else {
+            alert("Registration successful");
+        }
+    }).catch(error => {
+        console.error(error);
+    }).finally(() => {
+    });
 }
 
   return (
