@@ -5,6 +5,7 @@ const uri = config.get('mongoURI');
 const database = config.get('database');
 
 const client = new MongoClient(uri);
+const bcrypt = require("bcrypt");
 
 const connectDB = async () => {
   try {
@@ -34,9 +35,11 @@ const addUser = async (data) => {
     const db = client.db(database);
     const users = db.collection(collection);
     const user = await users.findOne({username: jsonData.username});
-
     if (user === null) {
       ret = true;
+      // Salting passwords referenced from: https://www.loginradius.com/blog/engineering/hashing-user-passwords-using-bcryptjs/
+      const salt = await bcrypt.genSalt(10);
+      jsonData.password = await bcrypt.hash(jsonData.password, salt);
       await users.insertOne(jsonData);
       console.log("Inserted 1 document");
     } else {
@@ -54,6 +57,7 @@ const addUser = async (data) => {
 // Insert a user into the database if the username does not already exist
 // data: expects two JSON entries (username, password)
 const loginUser = async (data) => {
+  console.log("Attempting to login");
   var ret = false;
   const collection = "users";
   try {
@@ -63,11 +67,11 @@ const loginUser = async (data) => {
     const db = client.db(database);
     const users = db.collection(collection);
     const user = await users.findOne({username: jsonData.username});
-    const pass = await users.findOne({password: jsonData.password});
+    const validPassword = await bcrypt.compare(jsonData.password, user.password);
 
     console.log(user.password);
-
-    if (user !== null && user.password === jsonData.password) {
+    
+    if (user !== null && validPassword) {
       ret = true;
       console.log("Login successful");
     } else {

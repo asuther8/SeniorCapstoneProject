@@ -15,7 +15,18 @@ export default function Register() {
   const [data, setData] = useState(null);
 
   function validateForm() {
-    return (username.length > 0 && password.length > 0) && (password === passwordConfirm);
+    var validForm = (username.length > 0 && password.length > 0) && (password === passwordConfirm);
+    var link = document.getElementById('validForm');
+    //WIP
+    //<!-- <p class="validForm" style="visibility:hidden;">Username/Passwords are too short or passwords do not match!</p> -->
+    /*if (!validForm){
+      //Hide HTML element referenced from: https://stackoverflow.com/questions/2420135/hide-html-element-by-id
+      //link.style.visibility = 'hidden';
+    }
+    else{
+      link.style.visibility = 'visible';
+    }*/
+    return validForm;
   }
 
   const handleSubmit = async (e) => {
@@ -83,7 +94,7 @@ export default function Register() {
         </Form.Group>
 
         <br></br>
-
+        
         <Button block size="lg" type="submit" disabled={!validateForm()}>
           Register
         </Button>

@@ -29,16 +29,6 @@ app.post('/register', (req, res) => {
     })
 });
 
-// Login: try to login an existing user in the database
-app.post('/login', (req, res) => {
-    console.log("\nAttempting to login user");
-    console.log(JSON.stringify(req.body));
-    var ret = db.loginUser(JSON.stringify(req.body));
-    ret.then(result => {
-        res.send(result);
-    })
-});
-
 const port = process.env.PORT || 8082;
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
