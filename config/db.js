@@ -57,7 +57,6 @@ const addUser = async (data) => {
 // Insert a user into the database if the username does not already exist
 // data: expects two JSON entries (username, password)
 const loginUser = async (data) => {
-  console.log("Attempting to login");
   var ret = false;
   const collection = "users";
   try {
