@@ -19,22 +19,32 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.post("/api/")
+    console.log('Username is  ' + username);
+    console.log('Password is ' + password);
     let result = await fetch(
-    'http://localhost:8082/api/user', {
+    'http://localhost:8082/login', {
         method: "post",
         body: JSON.stringify({ username, password }),
         headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
-    })
-    result = await result.json();
-    console.warn(result);
-    if (result) {
-        alert("Data saved successfully");
-        setUsername("");
-        setPassword("");
-    }
+    }).then(response => {
+      if (response.ok) {
+          return response.json();
+      }
+      throw response;
+    }).then(data => {
+      if (data === false) {
+        alert("Bad username/password");
+      }
+      else {
+        alert("Login successful");
+      }
+    }).catch(error => {
+      console.error(error);
+    }).finally(() => {
+    });
 }
 
   return (

@@ -43,6 +43,39 @@ const addUser = async (data) => {
       ret = false;
       console.log("username already in use");
     }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    client.close();
+  }
+  return ret;
+};
+
+// Insert a user into the database if the username does not already exist
+// data: expects two JSON entries (username, password)
+const loginUser = async (data) => {
+  var ret = false;
+  const collection = "users";
+  try {
+    await client.connect();
+    const jsonData = JSON.parse(data);
+
+    const db = client.db(database);
+    const users = db.collection(collection);
+    const user = await users.findOne({username: jsonData.username});
+    const pass = await users.findOne({password: jsonData.password});
+
+    console.log(user.password);
+
+    if (user !== null && user.password === jsonData.password) {
+      ret = true;
+      console.log("Login successful");
+    } else {
+      ret = false;
+      console.log("Bad username/password");
+    }
+  } catch (error) {
+    console.log(error);
   } finally {
     client.close();
   }
@@ -78,3 +111,4 @@ const updateUser = async (data) => {
 exports.connectDB = connectDB;
 exports.addUser = addUser;
 exports.updateUser = updateUser;
+exports.loginUser = loginUser;
