@@ -58,6 +58,7 @@ const arrayColumn = (arr, n) => arr.map(x => x[n]);
 //Chart.js options
 export const options = {
 	responsive: true,
+	maintainAspectRatio: false,
 	plugins: {
 		legend: {
 			position: 'top'
@@ -204,8 +205,18 @@ export function draw() {
 	};
 
 
-	ReactDOM.render(<Line options={options} data={data} />, document.getElementById('root'));
+	var w = window.innerWidth;
+	var h = window.innerHeight;
 
+	if (w < 1000) {
+
+		w = 1000;
+		options.responsive = "false";
+	}
+	
+	console.log(w);
+	console.log(options.responsive);
+	ReactDOM.render(<div id="dg"><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));
 };
 
 

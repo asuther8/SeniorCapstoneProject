@@ -108,6 +108,7 @@ export function draw() {
 	//Options set in here so they can be variable. Only delineates every week
 	var options = {
 		responsive: true,
+		maintainAspectRatio: false,
 		plugins: {
 			legend: {
 				position: "top"
@@ -198,7 +199,7 @@ export function draw() {
 		data: sund,
 		label: "Sunday",
 		borderColor: "rgb(128, 0, 0)",
-		backgroundColor: "rgba(128, 0, 0, 0.5)"
+		backgroundColor: "rgba(128, 0, 0, 0.25)"
 
 	};
 
@@ -207,7 +208,7 @@ export function draw() {
 		data: mond,
 		label: "Monday",
 		borderColor: "rgb(0, 128, 0)",
-		backgroundColor: "rgba(0, 128, 0, 0.5)"
+		backgroundColor: "rgba(0, 128, 0, 0.25)"
 
 	};
 
@@ -216,7 +217,7 @@ export function draw() {
 		data: tued,
 		label: "Tuesday",
 		borderColor: "rgb(0, 0, 128)",
-		backgroundColor: "rgba(0, 0, 128, 0.5)"
+		backgroundColor: "rgba(0, 0, 128, 0.25)"
 
 	};
 
@@ -225,7 +226,7 @@ export function draw() {
 		data: wedd,
 		label: "Wednesday",
 		borderColor: "rgb(128, 128, 0)",
-		backgroundColor: "rgba(128, 128, 0, 0.5)"
+		backgroundColor: "rgba(128, 128, 0, 0.25)"
 
 
 	};
@@ -235,7 +236,7 @@ export function draw() {
 		data: thud,
 		label: "Thursday",
 		borderColor: "rgb(128, 0, 128)",
-		backgroundColor: "rgba(128, 0, 128, 0.5)"
+		backgroundColor: "rgba(128, 0, 128, 0.25)"
 
 	};
 
@@ -244,7 +245,7 @@ export function draw() {
 		data: frid,
 		label: "Friday",
 		borderColor: "rgb(0, 128, 128)",
-		backgroundColor: "rgba(0, 128, 128, 0.5)"
+		backgroundColor: "rgba(0, 128, 128, 0.25)"
 
 	};
 
@@ -253,7 +254,7 @@ export function draw() {
 		label: "Saturday",
 		data: satd,
 		borderColor: "rgb(128, 128, 128)",
-		backgroundColor: "rgba(128, 128, 128, 0.5)"
+		backgroundColor: "rgba(128, 128, 128, 0.25)"
 	};
 
 
@@ -310,8 +311,18 @@ export function draw() {
 	};
 
 
-	ReactDOM.render(<Line options={options} data={data} />, document.getElementById("root"));
+	var w = window.innerWidth;
+	var h = window.innerHeight;
 
+	if (w < 1000) {
+
+		w = 1000;
+		options.responsive = "false";
+	}
+	
+	console.log(w);
+	console.log(options.responsive);
+	ReactDOM.render(<div id="gg"><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));
 };
 
 
