@@ -53,3 +53,17 @@
   min-height: 100vh;
   color: white;
 }
+
+#dg {
+
+	overflow-x: scroll;
+	background-color: #FFFFFF;
+
+}
+
+#gg {
+
+	overflow-x: scroll;
+	background-color: #FFFFFF;
+}
+
