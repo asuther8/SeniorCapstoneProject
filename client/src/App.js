@@ -13,6 +13,9 @@ import "./components/user/Login.css";
 import Register from "./components/user/Register";
 import "./components/user/Register.css";
 
+import Recovery from "./components/user/Recovery";
+import "./components/user/Recovery.css";
+
 import Dategraph from './components/graph/dategraph';
 
 class App extends Component {
@@ -47,6 +50,7 @@ class App extends Component {
             <Route exact path='/' element={< Login />}> </Route>
             <Route exact path='/login' element={< Login />}> </Route>
             <Route exact path='/register' element={< Register />}> </Route>
+            <Route exact path='/recovery' element={< Recovery />}> </Route>
             <Route exact path='/dategraph' element={< Dategraph />}> </Route>
           </Routes>
 

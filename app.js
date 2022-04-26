@@ -39,6 +39,16 @@ app.post('/login', (req, res) => {
     })
 });
 
+// Recovery: user attempting to retrieve a forgotten password
+app.post('/recovery', (req, res) => {
+    console.log("\nUser attempting password recovery");
+    console.log(JSON.stringify(req.body));
+    var ret = db.recoverAccount(JSON.stringify(req.body));
+    ret.then(result => {
+        res.send(result);
+    })
+});
+
 const port = process.env.PORT || 8082;
 
 app.listen(port, () => console.log(`Server running on port ${port}`));

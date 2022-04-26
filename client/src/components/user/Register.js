@@ -15,9 +15,8 @@ export default function Register() {
   const [data, setData] = useState(null);
 
   function validateForm() {
-    var validForm = (username.length > 0 && password.length > 0) && (password === passwordConfirm);
+    var validForm = (username.length > 0 && password.length > 0 && email.length > 0) && (password === passwordConfirm);
     var link = document.getElementById('validForm');
-    //WIP
     //<!-- <p class="validForm" style="visibility:hidden;">Username/Passwords are too short or passwords do not match!</p> -->
     /*if (!validForm){
       //Hide HTML element referenced from: https://stackoverflow.com/questions/2420135/hide-html-element-by-id
@@ -31,12 +30,13 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Email is " + email);
     console.log('Username is  ' + username);
     console.log('Password is ' + password);
     const result = await fetch(
     'http://localhost:8082/register', {
         method: "post",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, email }),
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ export default function Register() {
         throw response;
     }).then(data => {
         if (data === false) {
-            alert("Username already in use");
+            alert("Username or email already in use");
         }
         else {
             alert("Registration successful");
@@ -63,6 +63,17 @@ export default function Register() {
     <div className="Register">
       <Form onSubmit={handleSubmit}>
         <h3>Create An Account</h3>
+        <Form.Group size="lg" controlId="email">
+          <Form.Label></Form.Label>
+          <Form.Control
+            autoFocus
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+          />
+        </Form.Group>
+        <br></br>
         <Form.Group size="lg" controlId="username">
           <Form.Label></Form.Label>
           <Form.Control

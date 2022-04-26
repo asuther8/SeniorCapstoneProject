@@ -35,7 +35,8 @@ const addUser = async (data) => {
     const db = client.db(database);
     const users = db.collection(collection);
     const user = await users.findOne({username: jsonData.username});
-    if (user === null) {
+    const email = await users.findOne({email: jsonData.email});
+    if (user === null && email === null) {
       ret = true;
       // Salting passwords referenced from: https://www.loginradius.com/blog/engineering/hashing-user-passwords-using-bcryptjs/
       const salt = await bcrypt.genSalt(10);
@@ -44,7 +45,7 @@ const addUser = async (data) => {
       console.log("Inserted 1 document");
     } else {
       ret = false;
-      console.log("username already in use");
+      console.log("username or email already in use");
     }
   } catch (error) {
     console.log(error);
@@ -85,6 +86,34 @@ const loginUser = async (data) => {
   return ret;
 };
 
+// Send an email to help user recover password.
+// data: expects one JSON entries (email)
+const recoverAccount = async (data) => {
+  var ret = false;
+  const collection = "users";
+  try {
+    await client.connect();
+    const jsonData = JSON.parse(data);
+    const db = client.db(database);
+    const users = db.collection(collection);
+    const user = await users.findOne({email: jsonData.email});
+    
+    if (user !== null) {
+      ret = true;
+      console.log("Found user with this email");
+      
+    } else {
+      ret = false;
+      console.log("No user with this email");
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    client.close();
+  }
+  return ret;
+};
+
 // Update/add user information only if the user already exists
 const updateUser = async (data) => {
   const collection = "users";
@@ -114,4 +143,5 @@ const updateUser = async (data) => {
 exports.connectDB = connectDB;
 exports.addUser = addUser;
 exports.updateUser = updateUser;
+exports.recoverAccount = recoverAccount;
 exports.loginUser = loginUser;
