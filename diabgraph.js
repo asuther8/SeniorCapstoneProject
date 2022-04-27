@@ -61,11 +61,23 @@ export const options = {
 	maintainAspectRatio: false,
 	plugins: {
 		legend: {
-			position: 'top'
+			position: 'top',
+
+			labels: {
+
+				font: {
+
+					size: 20
+				}
+			}
 		},
 		title: {
 			display: true,
-			text: 'Diabetes Data'
+			text: 'Diabetes Data',
+			font: {
+
+				size: 30
+			}
 		},
 	},
 
@@ -73,6 +85,14 @@ export const options = {
 
 		x: {
 
+
+			ticks: {
+
+				font: {
+
+					size: 20
+				}
+			},
 
 			grid : {
 
@@ -85,7 +105,21 @@ export const options = {
 			title : {
 
 				display: true,
-				text: "Blood Glucose (mg/dL)"
+				text: "Blood Glucose (mg/dL)",
+				font: {
+
+					size: 24
+
+				}
+			},
+
+			ticks: {
+
+				font: {
+
+					size: 20
+				}
+
 			}
 		}
 	}

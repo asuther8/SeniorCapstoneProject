@@ -111,14 +111,26 @@ export function draw() {
 		maintainAspectRatio: false,
 		plugins: {
 			legend: {
-				position: "top"
+				position: "top",
+
+				labels: {
+
+					font: {
+
+						size: 20
+					}
+				}
 			},
 			title: {
 				display: true,
-				text: l
+				text: l,
+
+				font: {
+
+					size: 30
+				}
 			},
 		},
-
 		scales : {
 
 			x: {
@@ -127,7 +139,14 @@ export function draw() {
 					callback: function(index) {
 						return index % 24 === 0 ? "Week " + ((index / 24) + 1) : "";
 					},
-					autoSkip: false
+					autoSkip: false,
+
+					font: {
+
+						size: 20
+					}
+
+
 				},
 
 				grid : {
@@ -138,13 +157,25 @@ export function draw() {
 
 			y: {
 				min: 0,
-				title : {
+				title: {
 
 					display: true,
-					text: "Blood Glucose (mg/dL)"
+					text: "Blood Glucose (mg/dL)",
+
+					font: {
+
+						size: 24
+					}
+				},
+
+				ticks: {
+
+					font: {
+
+						size: 20
+					}
 				}
 			}
-
 		}
 	};
 
