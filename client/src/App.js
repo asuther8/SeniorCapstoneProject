@@ -17,6 +17,7 @@ import Recovery from "./components/user/Recovery";
 import "./components/user/Recovery.css";
 
 import Dategraph from './components/graph/dategraph';
+import Diabgraph from './components/graph/diabgraph';
 
 class App extends Component {
   render() {
@@ -30,6 +31,9 @@ class App extends Component {
             <Nav pills activeKey={window.location.pathname} className="mr-auto">
               <NavItem>
                 <NavLink href="/dategraph">Test DateGraph</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="/diabgraph">Test Diabgraph</NavLink>
               </NavItem>
             </Nav>
 
@@ -52,6 +56,7 @@ class App extends Component {
             <Route exact path='/register' element={< Register />}> </Route>
             <Route exact path='/recovery' element={< Recovery />}> </Route>
             <Route exact path='/dategraph' element={< Dategraph />}> </Route>
+            <Route exact path='/diabgraph' element={< Diabgraph />}> </Route>
           </Routes>
 
         </div>

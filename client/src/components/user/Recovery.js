@@ -61,7 +61,7 @@ export default function Login() {
         <br></br>
 
         <Button block size="lg" type="submit" disabled={!validateForm()}>
-          Login
+          Send
         </Button>
 
         <p class="message">Not registered? <a href="/register">Create an account</a></p>
