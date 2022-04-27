@@ -137,8 +137,12 @@ export function draw() {
 			},
 
 			y: {
-				min: 0
+				min: 0,
+				title : {
 
+					display: true,
+					text: "Blood Glucose (mg/dL)"
+				}
 			}
 
 		}
