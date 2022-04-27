@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
 @media all and (min-width: 320px) {
-  .Recovery {
+  .login {
     background-color: #14daaf;
     font-family: "Roboto", sans-serif;
     padding: 80px 0;
@@ -16,17 +16,17 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  .Recovery form .message {
+  .login form .message {
     margin: 15px 0 0;
     color: #b3b3b3;
     font-size: 12px;
   }
 
-  .Recovery .forgot a:hover {
+  .login .forgot a:hover {
     color: rgb(128, 128, 128);
   }
 
-  .Recovery .forgot a {
+  .login .forgot a {
     font-size: 12px;
     margin: -9px 0 0;
     color: #4CAF50;
@@ -34,16 +34,16 @@
     float: right;
   }
 
-  .Recovery form .message a {
+  .login form .message a {
     color: #4CAF50;
     text-decoration: none;
   }
 
-  .Recovery form .message a:hover {
+  .login form .message a:hover {
     color: rgb(74, 108, 153);
   }
 
-  .Recovery form {
+  .login form {
     position: absolute;
     top: 22%;
     right: 0;
@@ -69,23 +69,23 @@
      }
 }
 
-  .Recovery h3 {
+  .login h3 {
     padding-bottom: 20px;
   }
 
-  .Recovery label {
+  .login label {
     margin: 0 auto;
     max-width: 320px;
     min-width: 220px;
     float: left;
   }
 
-  .Recovery input {
+  .login input {
     margin-bottom: 10px;
     font-size: 16px;
   }
 
-  .Recovery button {
+  .login button {
     text-transform: uppercase;
     outline: 0;
     background-color: #328f8a;
@@ -100,14 +100,14 @@
     cursor: pointer;
   }
 
-  .Recovery button:hover,
+  .login button:hover,
 
-  .Recovery button[type=submit]:focus {
+  .login button[type=submit]:focus {
     background: #52cfeb;
     transition: all 0.3s ease-out;
   }
 
-  .Recovery button:active {
+  .login button:active {
     background: #42A2BC;
     box-shadow: 
         inset 0 0 5px rgba(0,0,0,0.3),

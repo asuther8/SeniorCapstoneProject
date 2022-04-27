@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, Outlet } from 'react-router-dom';
 import { Nav, NavItem, NavLink } from "reactstrap";
 import { withRouter } from "react-router";
 import { Navbar } from "react-bootstrap";
-
 
 import './App.css';
 
@@ -16,12 +15,32 @@ import "./components/user/Register.css";
 import Recovery from "./components/user/Recovery";
 import "./components/user/Recovery.css";
 
+import Dashboard from "./components/user/Dashboard";
+import "./components/user/Dashboard.css";
+
 import Dategraph from './components/graph/dategraph';
 import Diabgraph from './components/graph/diabgraph';
 
+function Logout() {
+  localStorage.clear();
+  window.location.href = '/';
+}
+
 class App extends Component {
   render() {
+    this.state = { user: false};
     const { location } = this.props;
+
+    const HomeRoute = ({ isLoggedIn, component: RouteComponent, redirectPath }) =>
+    isLoggedIn
+    ? <RouteComponent />
+    : <Navigate to='/login' />
+
+    const PrivateRoute = ({ isLoggedIn, component: RouteComponent, redirectPath }) =>
+      isLoggedIn
+      ? <RouteComponent />
+      : <Navigate to='/' />
+
     return (
       <Router>
         <div className="App">
@@ -36,6 +55,7 @@ class App extends Component {
                 <NavLink href="/diabgraph">Test Diabgraph</NavLink>
               </NavItem>
             </Nav>
+            
 
             <Nav pills activeKey={window.location.pathname} className="ml-auto">
               <NavItem>
@@ -47,16 +67,20 @@ class App extends Component {
               <NavItem>
                 <NavLink disabled href="/about">About us</NavLink>
               </NavItem>
+              <NavItem>
+                <NavLink href="#" onClick={Logout}>Logout</NavLink>
+              </NavItem>
             </Nav>
           </Navbar>
 
-         <Routes>
-            <Route exact path='/' element={< Login />}> </Route>
-            <Route exact path='/login' element={< Login />}> </Route>
-            <Route exact path='/register' element={< Register />}> </Route>
-            <Route exact path='/recovery' element={< Recovery />}> </Route>
-            <Route exact path='/dategraph' element={< Dategraph />}> </Route>
-            <Route exact path='/diabgraph' element={< Diabgraph />}> </Route>
+          <Routes>
+            <Route exact path='/' element={< HomeRoute isLoggedIn={localStorage.getItem('user')} component={Dashboard} />} />
+            <Route exact path='/login' element={< PrivateRoute isLoggedIn={!localStorage.getItem('user')} component={Login} />} />
+            <Route exact path='/register' element={< PrivateRoute isLoggedIn={!localStorage.getItem('user')} component={Register} />} />
+            <Route exact path='/recovery' element={< Recovery />} />
+            <Route exact path='/dategraph' element={< Dategraph />} />
+            <Route exact path='/diabgraph' element={< Diabgraph />} />
+            <Route path='/dashboard' element={< PrivateRoute isLoggedIn={localStorage.getItem('user')} component={Dashboard} />} />
           </Routes>
 
         </div>

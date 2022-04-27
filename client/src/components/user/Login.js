@@ -5,12 +5,14 @@ import { Nav, NavItem, NavLink } from "reactstrap";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import "./Login.css";
+import { propTypes } from "react-bootstrap/esm/Image";
 
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [user, setUser] = useState();
 
   function validateForm() {
     return username.length > 0 && password.length > 0;
@@ -37,9 +39,13 @@ export default function Login() {
     }).then(data => {
       if (data === false) {
         alert("Bad username/password");
+        localStorage.setItem('user', false);
       }
       else {
         alert("Login successful");
+        setUser(data);
+        localStorage.setItem('user', true);
+        window.location.replace("/dashboard");
       }
     }).catch(error => {
       console.error(error);

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import  { Navigate, useNavigate } from 'react-router-dom'
 import { Nav, NavItem, NavLink } from "reactstrap";
-import { useHistory } from "react-router-dom";
+
 import axios from "axios";
 import "./Register.css";
 
@@ -12,7 +13,7 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [data, setData] = useState(null);
+  const navigate = useNavigate();
 
   function validateForm() {
     var validForm = (username.length > 0 && password.length > 0 && email.length > 0) && (password === passwordConfirm);
@@ -52,6 +53,7 @@ export default function Register() {
         }
         else {
             alert("Registration successful");
+            window.location.replace("/login");
         }
     }).catch(error => {
         console.error(error);
