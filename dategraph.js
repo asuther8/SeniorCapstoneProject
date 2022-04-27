@@ -118,6 +118,7 @@ export function draw() {
 				text: l
 			},
 		},
+
 		scales : {
 
 			x: {
@@ -127,8 +128,23 @@ export function draw() {
 						return index % 24 === 0 ? "Week " + ((index / 24) + 1) : "";
 					},
 					autoSkip: false
+				},
+
+				grid : {
+
+					display: false
+				}
+			},
+
+			y: {
+				min: 0,
+				title : {
+
+					display: true,
+					text: "Blood Glucose (mg/dL)"
 				}
 			}
+
 		}
 	};
 
@@ -198,8 +214,8 @@ export function draw() {
 
 		data: sund,
 		label: "Sunday",
-		borderColor: "rgb(128, 0, 0)",
-		backgroundColor: "rgba(128, 0, 0, 0.25)"
+		borderColor: "rgb(230, 25, 75)",
+		backgroundColor: "rgba(230, 25, 75, 0.25)"
 
 	};
 
@@ -207,8 +223,8 @@ export function draw() {
 
 		data: mond,
 		label: "Monday",
-		borderColor: "rgb(0, 128, 0)",
-		backgroundColor: "rgba(0, 128, 0, 0.25)"
+		borderColor: "rgb(245, 130, 48)",
+		backgroundColor: "rgba(245, 130, 48, 0.25)"
 
 	};
 
@@ -216,8 +232,8 @@ export function draw() {
 
 		data: tued,
 		label: "Tuesday",
-		borderColor: "rgb(0, 0, 128)",
-		backgroundColor: "rgba(0, 0, 128, 0.25)"
+		borderColor: "rgb(255, 255, 25)",
+		backgroundColor: "rgba(255, 255, 25, 0.25)"
 
 	};
 
@@ -225,8 +241,8 @@ export function draw() {
 
 		data: wedd,
 		label: "Wednesday",
-		borderColor: "rgb(128, 128, 0)",
-		backgroundColor: "rgba(128, 128, 0, 0.25)"
+		borderColor: "rgb(60, 180, 75)",
+		backgroundColor: "rgba(60, 180, 75, 0.25)"
 
 
 	};
@@ -235,8 +251,8 @@ export function draw() {
 
 		data: thud,
 		label: "Thursday",
-		borderColor: "rgb(128, 0, 128)",
-		backgroundColor: "rgba(128, 0, 128, 0.25)"
+		borderColor: "rgb(0, 130, 200)",
+		backgroundColor: "rgba(0, 130, 200, 0.25)"
 
 	};
 
@@ -244,8 +260,8 @@ export function draw() {
 
 		data: frid,
 		label: "Friday",
-		borderColor: "rgb(0, 128, 128)",
-		backgroundColor: "rgba(0, 128, 128, 0.25)"
+		borderColor: "rgb(240, 50, 230)",
+		backgroundColor: "rgba(240, 50, 230, 0.25)"
 
 	};
 
@@ -319,7 +335,7 @@ export function draw() {
 		w = 1000;
 		options.responsive = "false";
 	}
-	
+
 	console.log(w);
 	console.log(options.responsive);
 	ReactDOM.render(<div id="gg"><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));

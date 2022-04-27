@@ -68,6 +68,27 @@ export const options = {
 			text: 'Diabetes Data'
 		},
 	},
+
+	scales : {
+
+		x: {
+
+
+			grid : {
+
+				display: false
+			}
+		},
+
+		y: {
+			min: 0,
+			title : {
+
+				display: true,
+				text: "Blood Glucose (mg/dL)"
+			}
+		}
+	}
 };
 
 
@@ -91,7 +112,7 @@ export function draw() {
 	var sub;
 	var glen;
 	var dval = document.getElementById("trange").options[document.getElementById("trange").selectedIndex].value;
-	
+
 
 	//Determines how far back in the array the graph will start reading
 	if (dval == "1day") {
@@ -138,7 +159,7 @@ export function draw() {
 
 
 	if (glen < 0) {
-		
+
 		alert("Not enough user data. Please select a shorter time span.");
 		return;
 	}
@@ -162,25 +183,25 @@ export function draw() {
 		data: arrayColumn(tdat, 4).slice(glen, lsize),
 		borderColor: 'rgb(99, 132, 255)',
 		backgroundColor: 'rgba(99, 132, 255, 0.5)'
-		
+
 	};
 
 	var cmax = {
-		
+
 		label: "Maximum",
 		data: arrayColumn(tdat, 8).slice(glen, lsize),
 		borderColor: 'rgb(132, 255, 99)',
 		backgroundColor: 'rgba(132, 255, 99, 0.5)'
 
 	};
-	
+
 	if (c1 != true && c2 != true && c3 != true) {
 
 		alert("Please check at least one data type.");
 		return;
 	}
 
-	
+
 	//Adds the data to the graph's set if the appropriate checkbox is clicked
 	if (c1) {
 
@@ -213,7 +234,7 @@ export function draw() {
 		w = 1000;
 		options.responsive = "false";
 	}
-	
+
 	console.log(w);
 	console.log(options.responsive);
 	ReactDOM.render(<div id="dg"><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));
