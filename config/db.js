@@ -6,6 +6,10 @@ const database = config.get('database');
 
 const client = new MongoClient(uri);
 const bcrypt = require("bcrypt");
+//Email validation referenced from: https://www.npmjs.com/package/email-validator
+const validator = require("email-validator");
+//Nodemailer/sending emails referenced from: https://dev.to/cyberwolve/how-to-implement-password-reset-via-email-in-node-js-132m
+const nodemailer = require("nodemailer");
 
 const connectDB = async () => {
   try {
@@ -31,12 +35,11 @@ const addUser = async (data) => {
   try {
     await client.connect();
     const jsonData = JSON.parse(data);
-
     const db = client.db(database);
     const users = db.collection(collection);
     const user = await users.findOne({username: jsonData.username});
     const email = await users.findOne({email: jsonData.email});
-    if (user === null && email === null) {
+    if (user === null && email === null && validator.validate(jsonData.email)) {
       ret = true;
       // Salting passwords referenced from: https://www.loginradius.com/blog/engineering/hashing-user-passwords-using-bcryptjs/
       const salt = await bcrypt.genSalt(10);
@@ -45,7 +48,7 @@ const addUser = async (data) => {
       console.log("Inserted 1 document");
     } else {
       ret = false;
-      console.log("username or email already in use");
+      console.log("username or email already in use/invalid");
     }
   } catch (error) {
     console.log(error);
@@ -63,14 +66,11 @@ const loginUser = async (data) => {
   try {
     await client.connect();
     const jsonData = JSON.parse(data);
-
     const db = client.db(database);
     const users = db.collection(collection);
     const user = await users.findOne({username: jsonData.username});
     const validPassword = await bcrypt.compare(jsonData.password, user.password);
-
     console.log(user.password);
-    
     if (user !== null && validPassword) {
       ret = true;
       console.log("Login successful");
@@ -97,11 +97,10 @@ const recoverAccount = async (data) => {
     const db = client.db(database);
     const users = db.collection(collection);
     const user = await users.findOne({email: jsonData.email});
-    
     if (user !== null) {
       ret = true;
       console.log("Found user with this email");
-      
+      sendEmail(user.email, "<p>Your password is:" + user.password + "</p>");
     } else {
       ret = false;
       console.log("No user with this email");
@@ -139,6 +138,37 @@ const updateUser = async (data) => {
     });
   });
 };
+
+//send email, referenced from: https://www.tutsmake.com/forgot-reset-password-in-node-js-express-mysql/
+function sendEmail(email, text) {
+ 
+  var email = email;
+  var text = text;
+
+  var mail = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+          user: 'diabeasy.noreply@gmail.com', // Your email id
+          pass: 'TotallyDiab0lical' // Your password
+      }
+  });
+
+  var mailOptions = {
+      from: 'diabeasy.noreply@gmail.com',
+      to: email,
+      subject: 'Password Recovery Link - Diabeasy',
+      html: text
+
+  };
+
+  mail.sendMail(mailOptions, function(error, info) {
+      if (error) {
+          console.log(1)
+      } else {
+          console.log(0)
+      }
+  });
+}
 
 exports.connectDB = connectDB;
 exports.addUser = addUser;

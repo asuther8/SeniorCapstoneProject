@@ -49,7 +49,7 @@ export default function Register() {
         throw response;
     }).then(data => {
         if (data === false) {
-            alert("Username or email already in use");
+            alert("Username or email already in use, or email is invalid!");
         }
         else {
             alert("Registration successful");
