@@ -112,7 +112,6 @@ const recoverAccount = async (data) => {
             token: crypto.randomBytes(32).toString("hex"),
         }).save();
       }
-      var sent = sendEmail(user.email, token);
       const link = `http://localhost:3000/password-reset?userID=${user._id}&token=${token.token}`;
       //const link = `http://localhost:3000/password-reset/${user._id}/${token.token}`;
       await sendEmail(user.email, "diabeasy - Password reset", link);
