@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 var MongoClient = require('mongodb').MongoClient;
+const MongoDB = require("mongodb");
 const config = require('config');
 const uri = config.get('mongoURI');
 const database = config.get('database');
@@ -129,15 +130,47 @@ const recoverAccount = async (data) => {
   return ret;
 };
 
-const resetPassword = async (data, user_id, token) => {
+const resetPassword = async (data) => {
   var ret = false;
   const collection = "users";
   try {
     await client.connect();
-    const jsonData = JSON.parse(data);
+    const jsonData = JSON.parse(data); //password, queryID, queryToken
     const db = client.db(database);
     const users = db.collection(collection);
-    //const user = await users.findOne({email: jsonData.email});
+    console.log(await users.findOne({email: "diabeasy.noreply@gmail.com"}));
+    const user = await users.findOne({_id: MongoDB.ObjectId(jsonData.queryID)});
+    if (!user){
+      console.log("Invalid or expired link");
+      return ret;
+    }
+    const token = await Token.findOne({
+        userId: user._id,
+        token: jsonData.queryToken,
+    })
+    if (!token){
+      console.log("Invalid or expired link");
+      return ret;
+    }
+    console.log("Found user");
+    const salt = await bcrypt.genSalt(10);
+    jsonData.password = await bcrypt.hash(jsonData.password, salt);
+    delete jsonData.queryID;
+    delete jsonData.queryToken;
+    const query = await users.findOne(user);
+    const update = {$set: jsonData};
+    const options = {upsert: false };
+    users.updateOne(query, update, options, function(err, res) {
+      if (err) throw err;
+      const updated = res.modifiedCount;
+      if (updated) {
+        console.log("User updated password");
+      } else {
+        console.log("user not found");
+      }
+    });
+    await token.delete();
+    ret = true;
   } catch (error) {
     console.log(error);
   } finally {

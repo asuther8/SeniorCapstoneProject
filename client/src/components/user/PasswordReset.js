@@ -25,18 +25,14 @@ export default function Login() {
     });
     let queryID = params.userID;
     let queryToken = params.token;
-    alert("Attempting password reset with ID:" + queryID + " and token:" + queryToken);
+    //alert("Attempting password reset with ID:" + queryID + " and token:" + queryToken);
     let result = await fetch(
     `http://localhost:8082/password-reset/`, {
         method: "post",
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, queryID, queryToken}),
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-        },
-        query:{
-          "userID": [queryID],
-          "token": [queryToken]
         }
     }).then(response => {
       if (response.ok) {

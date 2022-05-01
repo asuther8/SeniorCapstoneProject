@@ -80,11 +80,9 @@ app.post('/recovery', (req, res) => {
 // Recovery2: user changes their password
 app.post('/password-reset', (req, res) => {
     //Req query referenced from: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
-    var userID = req.query.userID;
-    var token = req.query.token;
     console.log("\nUser attempting password reset");
-    console.log(JSON.stringify(req.body), userID, token);
-    var ret = db.resetPassword(JSON.stringify(req.body), userID, token);
+    console.log(JSON.stringify(req.body));
+    var ret = db.resetPassword(JSON.stringify(req.body));
     ret.then(result => {
         res.send(result);
     })
