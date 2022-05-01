@@ -5,6 +5,14 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
+      type: String,
+      required: true,
+  },
   date: {
     type: Date,
     required: true
@@ -41,3 +49,14 @@ const UserSchema = new mongoose.Schema({
 });
 
 module.exports = User = mongoose.model('user', UserSchema);
+
+const validate = (user) => {
+  const schema = Joi.object({
+      name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+  });
+  return schema.validate(user);
+};
+
+module.exports = {User, validate};

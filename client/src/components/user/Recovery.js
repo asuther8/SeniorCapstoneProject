@@ -19,7 +19,7 @@ export default function Login() {
     e.preventDefault();
     console.log('Email is ' + email);
     let result = await fetch(
-    'http://localhost:8082/recovery', {
+    'http://localhost:8082/recovery/', {
         method: "post",
         body: JSON.stringify({ email }),
         headers: {
@@ -36,7 +36,7 @@ export default function Login() {
         alert("Couldn't find an account with that email address.");
       }
       else {
-        alert("Recovery email sent! TODO: actually send recovery email!");
+        alert("Recovery email sent! Please check your email to find the link for resetting your password.");
       }
     }).catch(error => {
       console.error(error);

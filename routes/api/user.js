@@ -1,6 +1,6 @@
 const express = require('express');
+const Joi = require("joi");
 const router = express.Router();
-
 const User = require('../../models/User');
 
 // @route GET api/user/test
@@ -33,6 +33,20 @@ router.post('/', (req, res) => {
   User.create(req.body)
     .then(book => res.json({ msg: 'User added successfully' }))
     .catch(err => res.status(400).json({ error: 'Unable to add this User' }));
+});
+
+
+//Referenced from: https://dev.to/cyberwolve/how-to-implement-password-reset-via-email-in-node-js-132m
+router.post("/", async (req, res) => {
+  try {
+      const { error } = validate(req.body);
+      if (error) return res.status(400).send(error.details[0].message);
+      const user = await new User(req.body).save();
+      res.send(user);
+  } catch (error) {
+      res.send("An error occured");
+      console.log(error);
+  }
 });
 
 // @route GET api/user/:id

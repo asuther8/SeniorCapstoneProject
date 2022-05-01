@@ -3,7 +3,11 @@ var MongoClient = require('mongodb').MongoClient;
 const config = require('config');
 const uri = config.get('mongoURI');
 const database = config.get('database');
-
+const Joi = require("joi");
+const crypto = require("crypto");
+//const { User } = require("/../models/User");
+const Token = require("../models/token");
+const sendEmail = require("../utils/sendEmail");
 const client = new MongoClient(uri);
 const bcrypt = require("bcrypt");
 //Email validation referenced from: https://www.npmjs.com/package/email-validator
@@ -16,10 +20,10 @@ const connectDB = async () => {
     await mongoose.connect(
       uri,
       {
-        useNewUrlParser: true
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
       }
     );
-
     console.log('MongoDB is connected to ' + uri);
   } catch (err) {
     console.error(err.message);
@@ -86,7 +90,7 @@ const loginUser = async (data) => {
   return ret;
 };
 
-// Send an email to help user recover password.
+// Send an email to help user reset password.
 // data: expects one JSON entries (email)
 const recoverAccount = async (data) => {
   var ret = false;
@@ -100,7 +104,19 @@ const recoverAccount = async (data) => {
     if (user !== null) {
       ret = true;
       console.log("Found user with this email");
-      sendEmail(user.email, "<p>Your password is:" + user.password + "</p>");
+      var token = await users.findOne({ userId: user._id });
+      if (!token) {
+        token = await new Token({
+            userId: user._id,
+            token: crypto.randomBytes(32).toString("hex"),
+        }).save();
+      }
+      var sent = sendEmail(user.email, token);
+      const link = `http://localhost:3000/password-reset?userID=${user._id}&token=${token.token}`;
+      //const link = `http://localhost:3000/password-reset/${user._id}/${token.token}`;
+      await sendEmail(user.email, "diabeasy - Password reset", link);
+      console.log("Sent password reset link");
+      ret = true;
     } else {
       ret = false;
       console.log("No user with this email");
@@ -113,6 +129,39 @@ const recoverAccount = async (data) => {
   return ret;
 };
 
+const resetPassword = async (data, user_id, token) => {
+  var ret = false;
+  const collection = "users";
+  try {
+    await client.connect();
+    const jsonData = JSON.parse(data);
+    const db = client.db(database);
+    const users = db.collection(collection);
+    //const user = await users.findOne({email: jsonData.email});
+  } catch (error) {
+    console.log(error);
+  } finally {
+    client.close();
+  }
+  return ret;
+};
+
+/*var mysql=require('mysql');
+ var connection=mysql.createConnection({
+   host:'localhost',
+   user:'root',
+   password:'',
+   database:'my-node'
+ });
+connection.connect(function(error){
+   if(!!error){
+     console.log(error);
+   }else{
+     console.log('Connected!:)');
+   }
+ });  
+module.exports = connection; */
+
 // Update/add user information only if the user already exists
 const updateUser = async (data) => {
   const collection = "users";
@@ -122,7 +171,6 @@ const updateUser = async (data) => {
     if (err) throw err;
     var dbo = db.db(database);
     const users = dbo.collection(collection);
-
     const query = users.find(username);
     const update = {$set:jsonData};
     const options = {upsert: true };
@@ -140,27 +188,22 @@ const updateUser = async (data) => {
 };
 
 //send email, referenced from: https://www.tutsmake.com/forgot-reset-password-in-node-js-express-mysql/
-function sendEmail(email, text) {
- 
+/*function sendEmail(email, token) {
   var email = email;
-  var text = text;
-
+  var token = token;
   var mail = nodemailer.createTransport({
       service: 'gmail',
       auth: {
           user: 'diabeasy.noreply@gmail.com', // Your email id
-          pass: 'TotallyDiab0lical' // Your password
+          pass: 'dvnayxucnchhruyu' // Your password
       }
   });
-
   var mailOptions = {
       from: 'diabeasy.noreply@gmail.com',
       to: email,
-      subject: 'Password Recovery Link - Diabeasy',
-      html: text
-
+      subject: 'Password Reset Link - Diabeasy',
+      html: '<p>You requested for reset password, kindly use this <a href="http://localhost:3000/reset-password?token=' + token + '">link</a> to reset your password</p>'
   };
-
   mail.sendMail(mailOptions, function(error, info) {
       if (error) {
           console.log(1)
@@ -168,10 +211,11 @@ function sendEmail(email, text) {
           console.log(0)
       }
   });
-}
+}*/
 
 exports.connectDB = connectDB;
 exports.addUser = addUser;
 exports.updateUser = updateUser;
 exports.recoverAccount = recoverAccount;
 exports.loginUser = loginUser;
+exports.resetPassword = resetPassword;

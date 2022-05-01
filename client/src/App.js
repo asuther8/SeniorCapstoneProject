@@ -15,6 +15,8 @@ import "./components/user/Register.css";
 import Recovery from "./components/user/Recovery";
 import "./components/user/Recovery.css";
 
+import PasswordReset from "./components/user/PasswordReset";
+
 import Dashboard from "./components/user/Dashboard";
 import "./components/user/Dashboard.css";
 
@@ -78,6 +80,7 @@ class App extends Component {
             <Route exact path='/login' element={< PrivateRoute isLoggedIn={!localStorage.getItem('user')} component={Login} />} />
             <Route exact path='/register' element={< PrivateRoute isLoggedIn={!localStorage.getItem('user')} component={Register} />} />
             <Route exact path='/recovery' element={< Recovery />} />
+            <Route exact path='/password-reset' element={< PasswordReset />} />
             <Route exact path='/dategraph' element={< Dategraph />} />
             <Route exact path='/diabgraph' element={< Diabgraph />} />
             <Route path='/dashboard' element={< PrivateRoute isLoggedIn={localStorage.getItem('user')} component={Dashboard} />} />
