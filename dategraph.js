@@ -361,16 +361,27 @@ export function draw() {
 	var w = window.innerWidth;
 	var h = window.innerHeight;
 
+
 	if (w < 1000) {
 
-		w = 1000;
-		options.responsive = "false";
+		w = 1200;
+
+	ReactDOM.render(<div id="dg" style={{height:"150%", width: "300%"}}><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));
 	}
 
+	else {
+	
+		ReactDOM.render(<div id="dg"><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));
+
+	}
 	console.log(w);
+	console.log(h);
+
+
 	console.log(options.responsive);
-	ReactDOM.render(<div id="gg"><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));
+	console.log(options.maintainAspectRatio);
 };
+
 
 
 //As of right now, the CSV Reader loading thing is from the offical react-papaparse website
