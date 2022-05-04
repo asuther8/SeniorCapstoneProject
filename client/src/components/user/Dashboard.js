@@ -1,30 +1,19 @@
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { Nav, NavItem, NavLink } from "reactstrap";
-import { useHistory } from "react-router-dom";
-import axios from "axios";
 import "./Dashboard.css";
 
 
-export default function Login() {
+export default function Dashboard() {
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, getUsername] = useState(localStorage.getItem('user'));
 
-  function validateForm() {
-    return username.length > 0 && password.length > 0;
-  }
-
-
-  const handleSubmit = async (e) => {
+  const handleSubmitFile = async (e) => {
     e.preventDefault();
-    console.log('Username is  ' + username);
-    console.log('Password is ' + password);
     let result = await fetch(
-    'http://localhost:8082/login', {
+    'http://localhost:8082/upload', {
         method: "post",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username }),
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -36,11 +25,11 @@ export default function Login() {
       throw response;
     }).then(data => {
       if (data === false) {
-        alert("Bad username/password");
+        alert("Upload error");
       }
       else {
-        alert("Login successful");
-        window.location.replace("/dashboard");
+        alert("Upload successful");
+        //window.location.replace("/dashboard");
       }
     }).catch(error => {
       console.error(error);
@@ -50,8 +39,11 @@ export default function Login() {
 
   return (
     <div className="Dashboard">
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmitFile}>
         <h3>Dashboard</h3>
+        <Button block size="lg" type="submit">
+          Upload
+        </Button>
       </Form>
     </div>
   );

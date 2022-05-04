@@ -42,6 +42,37 @@ class App extends Component {
       isLoggedIn
       ? <RouteComponent />
       : <Navigate to='/' />
+    
+    // If user is logged in, return the first navbar, else return the second
+    const NavbarCreate = ({ isLoggedIn }) =>
+    isLoggedIn
+    ? <><Nav pills activeKey={window.location.pathname} className="mr-auto">
+          <NavItem>
+            <NavLink href="/dategraph">DateGraph</NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink href="/diabgraph">DiabGraph</NavLink>
+          </NavItem>
+        </Nav>
+        <Nav pills activeKey={window.location.pathname} className="ml-auto">
+            <NavItem>
+              <NavLink disabled href="/about">About us</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="#" onClick={Logout}>Logout</NavLink>
+            </NavItem>
+          </Nav></>
+    : <Nav pills activeKey={window.location.pathname} className="ml-auto">
+        <NavItem>
+          <NavLink href="/login">Login</NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink href="/register">Register</NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink disabled href="/about">About us</NavLink>
+        </NavItem>
+      </Nav>
 
     return (
       <Router>
@@ -49,30 +80,7 @@ class App extends Component {
 
           <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
             <Navbar.Brand>DiabEasy</Navbar.Brand>
-            <Nav pills activeKey={window.location.pathname} className="mr-auto">
-              <NavItem>
-                <NavLink href="/dategraph">Test DateGraph</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="/diabgraph">Test Diabgraph</NavLink>
-              </NavItem>
-            </Nav>
-            
-
-            <Nav pills activeKey={window.location.pathname} className="ml-auto">
-              <NavItem>
-                <NavLink href="/login">Login</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="/register">Register</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink disabled href="/about">About us</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="#" onClick={Logout}>Logout</NavLink>
-              </NavItem>
-            </Nav>
+            <NavbarCreate isLoggedIn={ localStorage.getItem('user') } />
           </Navbar>
 
           <Routes>

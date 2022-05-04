@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { Nav, NavItem, NavLink } from "reactstrap";
-import { useHistory } from "react-router-dom";
-import axios from "axios";
 import "./Login.css";
-import { propTypes } from "react-bootstrap/esm/Image";
 
 
 export default function Login() {
@@ -21,8 +17,6 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Username is  ' + username);
-    console.log('Password is ' + password);
     let result = await fetch(
     'http://localhost:8082/login', {
         method: "post",
@@ -42,9 +36,9 @@ export default function Login() {
         localStorage.setItem('user', false);
       }
       else {
-        alert("Login successful");
+        //alert("Login successful");
         setUser(data);
-        localStorage.setItem('user', true);
+        localStorage.setItem('user', username);
         window.location.replace("/dashboard");
       }
     }).catch(error => {

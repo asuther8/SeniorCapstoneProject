@@ -33,16 +33,6 @@ app.get('/',(req,res) => {
     res.sendFile('index.html');
 });
 
-app.get('/admin',(req,res) => {
-    console.log("at /admin");
-    res.send("hello");
-    sess = req.session;
-    if(sess.email) {
-        return res.redirect('/');
-    }
-    //res.sendFile(__dirname + "/client/src/components/user/login.js");
-});
-
 
 // Register: try to add a new user to the database
 app.post('/register', (req, res) => {
@@ -62,7 +52,6 @@ app.post('/login', (req, res) => {
     ret.then(result => {
         sess = req.session;
         sess.email = req.body.email;
-        console.log(result);
         res.send(result);
     })
 });
@@ -87,6 +76,20 @@ app.post('/password-reset', (req, res) => {
         res.send(result);
     })
 });
+
+// Upload: try to upload a file to the user's uploads
+app.post('/upload', (req, res) => {
+    console.log("\nAttempting to upload file");
+    console.log(JSON.stringify(req.body));
+    var ret = db.uploadFile(JSON.stringify(req.body));
+    ret.then(result => {
+        sess = req.session;
+        sess.email = req.body.email;
+        res.send(result);
+    })
+});
+
+const port = process.env.PORT || 8082;
 
 /*
 // update password to database, referenced from: https://www.tutsmake.com/forgot-reset-password-in-node-js-express-mysql/

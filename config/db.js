@@ -16,6 +16,9 @@ const validator = require("email-validator");
 //Nodemailer/sending emails referenced from: https://dev.to/cyberwolve/how-to-implement-password-reset-via-email-in-node-js-132m
 const nodemailer = require("nodemailer");
 
+const csvtojson = require('csvtojson');
+const { usePapaParse } = require('react-papaparse');
+
 const connectDB = async () => {
   try {
     await mongoose.connect(
@@ -75,7 +78,6 @@ const loginUser = async (data) => {
     const users = db.collection(collection);
     const user = await users.findOne({username: jsonData.username});
     const validPassword = await bcrypt.compare(jsonData.password, user.password);
-    console.log(user.password);
     if (user !== null && validPassword) {
       ret = true;
       console.log("Login successful");
@@ -91,7 +93,71 @@ const loginUser = async (data) => {
   return ret;
 };
 
-// Send an email to help user reset password.
+const uploadFile = async (data) => {
+  var ret = false;
+  const collection = "users";
+  try {
+    await client.connect();
+    const jsonData = JSON.parse(data);
+    const db = client.db(database);
+    const users = db.collection(collection);
+    const user = await users.findOne({username: jsonData.username});
+    if (user !== null) {
+      var result = csvtojson().fromFile("diabetes_data.csv").then(async source => {
+        await client.connect();
+        const jsonData = JSON.parse(data);
+        const db = client.db(database);
+        const users = db.collection(collection);
+        var arr = [];
+        for (var i = 0; i < source.length; i++){
+            var row = source[i];
+            var date = source[i]["Date"];
+            var dataRow = "Data." + date;
+            /*
+            const res = await users.updateOne({username: jsonData.username},
+              {
+                $push: {
+                  "Data": row
+                }
+              },
+              {
+                upsert: true
+              });
+            */
+            arr.push(row);
+        }
+        const res = await users.updateMany({username: jsonData.username},
+          {
+            $set: {
+              "Data": arr
+            }
+          },
+          {
+            upsert: true
+          });
+        ret = true;
+      }).catch(err => {
+        console.log(err);
+        ret = false;
+      }).finally(res => {
+        client.close();
+      })
+      if (result) ret = true;
+
+      console.log("Upload successful");
+    } else {
+      ret = false;
+      console.log("Could not find username in database");
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    client.close();
+  }
+  return ret;
+};
+
+// Send an email to help user recover password.
 // data: expects one JSON entries (email)
 const recoverAccount = async (data) => {
   var ret = false;
@@ -251,3 +317,4 @@ exports.updateUser = updateUser;
 exports.recoverAccount = recoverAccount;
 exports.loginUser = loginUser;
 exports.resetPassword = resetPassword;
+exports.uploadFile = uploadFile;

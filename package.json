@@ -58,6 +58,7 @@
     "cookie-signature": "^1.0.6",
     "cors": "^2.8.5",
     "crypto-random-string": "^2.0.0",
+    "csvtojson": "^2.0.10",
     "debug": "^2.6.9",
     "decompress-response": "^3.3.0",
     "deep-extend": "^0.6.0",
