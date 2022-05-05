@@ -4,6 +4,8 @@ import { useCSVReader } from 'react-papaparse';
 
 import ReactDOM from 'react-dom';
 
+import './graph.css';
+
 import {
 	Chart as ChartJS,
 	CategoryScale,
@@ -331,6 +333,7 @@ export default function GraphStart() {
 		)}
 		</CSVReader>
 
+		<div classname="graph">
 		<p>Choose your hourly data:</p>
 		<div>
 		<input type="checkbox" id="Avg"></input>
@@ -360,6 +363,7 @@ export default function GraphStart() {
 
 		<p></p>
 		<button onClick={draw}>Draw Graph</button>
+		</div>
 		</>
 	);
 }

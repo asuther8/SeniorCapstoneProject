@@ -48,6 +48,9 @@ class App extends Component {
     isLoggedIn
     ? <><Nav pills activeKey={window.location.pathname} className="mr-auto">
           <NavItem>
+            <NavLink href="/dashboard">Home</NavLink>
+          </NavItem>
+          <NavItem>
             <NavLink href="/dategraph">DateGraph</NavLink>
           </NavItem>
           <NavItem>

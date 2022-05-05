@@ -17,7 +17,6 @@ app.get('/', (req, res) => res.send('Landing Page'));
 // Setup bodyParser for parsing JSON requests
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
-app.use(session({secret: 'ssshhhhh', saveUninitialized: true, resave: true}));
 app.use(express.static(__dirname + '/client/src'));
 app.use("/api/users", users);
 app.use("/api/password-reset", passwordReset);
@@ -51,7 +50,7 @@ app.post('/login', (req, res) => {
     var ret = db.loginUser(JSON.stringify(req.body));
     ret.then(result => {
         sess = req.session;
-        sess.email = req.body.email;
+        //sess.email = req.body.email;
         res.send(result);
     })
 });
@@ -89,7 +88,17 @@ app.post('/upload', (req, res) => {
     })
 });
 
-const port = process.env.PORT || 8082;
+// Fetch: try to fetch a user's data
+app.post('/fetch', (req, res) => {
+    console.log("\nAttempting to fetch user data");
+    console.log(JSON.stringify(req.body));
+    var ret = db.fetchData(JSON.stringify(req.body));
+    ret.then(result => {
+        sess = req.session;
+        sess.email = req.body.email;
+        res.send(result);
+    })
+});
 
 /*
 // update password to database, referenced from: https://www.tutsmake.com/forgot-reset-password-in-node-js-express-mysql/

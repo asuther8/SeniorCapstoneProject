@@ -15,9 +15,11 @@ const bcrypt = require("bcrypt");
 const validator = require("email-validator");
 //Nodemailer/sending emails referenced from: https://dev.to/cyberwolve/how-to-implement-password-reset-via-email-in-node-js-132m
 const nodemailer = require("nodemailer");
+const moment = require("moment");
 
 const csvtojson = require('csvtojson');
 const { usePapaParse } = require('react-papaparse');
+const { find } = require('../models/token');
 
 const connectDB = async () => {
   try {
@@ -93,6 +95,130 @@ const loginUser = async (data) => {
   return ret;
 };
 
+// Converts an arbitrary date string to ISO format YYYY-MM-DD hh:mm:ss
+const convertDate = async (date) => {
+  var date = new Date(date).toString();
+  var year = date.slice(11,15);
+  var month = date.slice(4,7);
+  var day = date.slice(8, 10);
+  var time = date.slice(16,24);
+  switch(month){
+    case "Jan":
+      month = "01"; break;
+    case "Feb":
+      month = "02"; break;
+    case "Mar":
+      month = "03"; break;
+    case "Apr":
+      month = "04"; break;
+    case "May":
+      month = "05"; break;
+    case "Jun":
+      month = "06"; break;
+    case "Jul":
+      month = "07"; break;
+    case "Aug":
+      month = "08"; break;
+    case "Sep":
+      month = "09"; break;
+    case "Oct":
+      month = "10"; break;
+    case "Nov":
+      month = "11"; break;
+    case "Dec":
+      month = "12"; break;
+  }
+  return year + '-' + month + '-' + day + ' ' + time;
+}
+
+const fetchData = async (data) => {
+  var ret = false;
+  const collection = "users";
+  try {
+    await client.connect();
+    const jsonData = JSON.parse(data);
+    const db = client.db(database);
+    const users = db.collection(collection);
+    const user = await users.findOne({username: jsonData.username});
+    if (user !== null) {
+      var result = csvtojson().fromFile("diabetes_data.csv").then(async source => {
+        await client.connect();
+        const jsonData = JSON.parse(data);
+        const db = client.db(database);
+        const users = db.collection(collection);
+        var arr = [];
+        for (var i = 0; i < source.length; i++){
+            var row = source[i];
+            var date = await convertDate(source[i]["Date"]);
+            var dataRow = "Data." + date;
+            source[i]["Date"] = date;
+            arr.push(row);
+        }
+
+        // Push timestamps to user's Data array and sort
+        try{          
+          await users.updateMany({username: jsonData.username},
+          {
+            $push: {
+              "Data": {
+                $each: arr,
+                $sort: {"Date": 1}
+              }
+            }
+          },
+          {
+            upsert: true
+          });     
+        } catch (err){
+          console.log(err);
+        }
+
+        users.aggregate([
+          { $match: { username: jsonData.username }},
+          { $unwind: '$Data' },
+          { $group: { _id: '$Data.Date', data: { $addToSet: '$Meta' }}}
+        ]);
+
+        /*
+        users.aggregate([
+          { $match: { username: jsonData.username }},
+          {'$addFields': {'Data.Date': {'$setUnion': ['$Data.Date', []]}}}
+        ])
+        */
+        
+        users.find({username: jsonData.username}).forEach(async(doc) => {
+          await doc.Data.forEach(async(d) => {
+            console.log(d["Date"]);
+            /*
+            if (last["Date"] === d["Date"]){
+              console.log("Removing " + last["Date"] + " which matches " + d["Date"]);
+              await users.updateOne({username: jsonData.username}, { $pull: { "Data": { Date: d["Date"]}}});
+            }
+            */
+          })
+        })
+        
+
+      }).catch(err => {
+        console.log(err);
+      }).finally(res => {
+        client.close();
+      })
+      if (result) ret = true;
+
+      console.log("Upload successful");
+    } else {
+      ret = false;
+      console.log("Could not find username in database");
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    client.close();
+  }
+  return ret;
+};
+
 const uploadFile = async (data) => {
   var ret = false;
   const collection = "users";
@@ -111,34 +237,58 @@ const uploadFile = async (data) => {
         var arr = [];
         for (var i = 0; i < source.length; i++){
             var row = source[i];
-            var date = source[i]["Date"];
+            var date = await convertDate(source[i]["Date"]);
             var dataRow = "Data." + date;
-            /*
-            const res = await users.updateOne({username: jsonData.username},
-              {
-                $push: {
-                  "Data": row
-                }
-              },
-              {
-                upsert: true
-              });
-            */
+            source[i]["Date"] = date;
             arr.push(row);
         }
-        const res = await users.updateMany({username: jsonData.username},
+
+        // Push timestamps to user's Data array and sort
+        try{          
+          await users.updateMany({username: jsonData.username},
           {
-            $set: {
-              "Data": arr
+            $push: {
+              "Data": {
+                $each: arr,
+                $sort: {"Date": 1}
+              }
             }
           },
           {
             upsert: true
-          });
-        ret = true;
+          });     
+        } catch (err){
+          console.log(err);
+        }
+
+        users.aggregate([
+          { $match: { username: jsonData.username }},
+          { $unwind: '$Data' },
+          { $group: { _id: '$Data.Date', data: { $addToSet: '$Meta' }}}
+        ]);
+
+        /*
+        users.aggregate([
+          { $match: { username: jsonData.username }},
+          {'$addFields': {'Data.Date': {'$setUnion': ['$Data.Date', []]}}}
+        ])
+        */
+        
+        users.find({username: jsonData.username}).forEach(async(doc) => {
+          await doc.Data.forEach(async(d) => {
+            console.log(d["Date"]);
+            /*
+            if (last["Date"] === d["Date"]){
+              console.log("Removing " + last["Date"] + " which matches " + d["Date"]);
+              await users.updateOne({username: jsonData.username}, { $pull: { "Data": { Date: d["Date"]}}});
+            }
+            */
+          })
+        })
+        
+
       }).catch(err => {
         console.log(err);
-        ret = false;
       }).finally(res => {
         client.close();
       })
@@ -318,3 +468,4 @@ exports.recoverAccount = recoverAccount;
 exports.loginUser = loginUser;
 exports.resetPassword = resetPassword;
 exports.uploadFile = uploadFile;
+exports.fetchData = fetchData;

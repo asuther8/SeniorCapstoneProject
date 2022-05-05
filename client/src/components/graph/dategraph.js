@@ -5,6 +5,8 @@ import { useCSVReader } from "react-papaparse";
 
 import ReactDOM from "react-dom";
 
+import "./graph.css";
+
 import {
 	Chart as ChartJS,
 	CategoryScale,
@@ -195,23 +197,18 @@ export function draw() {
 	//Loops through assigning data to sepcific days
 	for (var i = 0; i < labels.length; i++) {
 
-
 		dateval = new Date(labels[i].split(" ")[0]);
 
 		if (i === 0) {
-
 			count = 0;
 			track = dateval.getDay(); 
 		}
 
 
 		if (dateval.getDay() == track) {
-
 			count = count + 1;
 			lset.push("Hour " + count);
 		}
-
-
 
 		switch (dateval.getDay()) {
 			case 0:
@@ -237,81 +234,62 @@ export function draw() {
 			default:
 				break;
 		}
-
-
 	}
 
 	var sun = {
-
 		data: sund,
 		label: "Sunday",
 		borderColor: "rgb(230, 25, 75)",
 		backgroundColor: "rgba(230, 25, 75, 0.25)"
-
 	};
 
 	var mon = {
-
 		data: mond,
 		label: "Monday",
 		borderColor: "rgb(245, 130, 48)",
 		backgroundColor: "rgba(245, 130, 48, 0.25)"
-
 	};
 
 	var tue = {
-
 		data: tued,
 		label: "Tuesday",
 		borderColor: "rgb(255, 255, 25)",
 		backgroundColor: "rgba(255, 255, 25, 0.25)"
-
 	};
 
 	var wed = {
-
 		data: wedd,
 		label: "Wednesday",
 		borderColor: "rgb(60, 180, 75)",
 		backgroundColor: "rgba(60, 180, 75, 0.25)"
-
-
 	};
 
 	var thu = {
-
 		data: thud,
 		label: "Thursday",
 		borderColor: "rgb(0, 130, 200)",
 		backgroundColor: "rgba(0, 130, 200, 0.25)"
-
 	};
 
 	var fri = {
-
 		data: frid,
 		label: "Friday",
 		borderColor: "rgb(240, 50, 230)",
 		backgroundColor: "rgba(240, 50, 230, 0.25)"
-
 	};
 
 	var sat = {
-
 		label: "Saturday",
 		data: satd,
 		borderColor: "rgb(128, 128, 128)",
 		backgroundColor: "rgba(128, 128, 128, 0.25)"
 	};
 
-
-
 	if (c1 != true && c2 != true && c3 != true && c4 != true && c5 != true && c6 != true && c7 != true) {
 
 		alert("Please check at least one day.");
 		return;
 	}
-
 
 	//Add data to the graph's dataset if the specific box is checked
 	if (c1) {
@@ -349,7 +327,6 @@ export function draw() {
 		dsets.push(sat);
 	}
 
-
 	console.log(dsets);
 	data = {
 
@@ -357,26 +334,19 @@ export function draw() {
 		datasets: dsets
 	};
 
-
 	var w = window.innerWidth;
 	var h = window.innerHeight;
 
-
 	if (w < 1000) {
-
 		w = 1200;
-
-	ReactDOM.render(<div id="dg" style={{height:"150%", width: "300%"}}><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));
+		ReactDOM.render(<div id="dg" style={{height:"15%", width: "30%"}}><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));
 	}
-
 	else {
-	
-		ReactDOM.render(<div id="dg"><Line overflow-x={"scroll"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("root"));
-
+		ReactDOM.render(<div id="dg"><Line overflow-x={"scroll"} width={15} height={15} options={options} data={data} /></div>, document.getElementById("root"));
 	}
+
 	console.log(w);
 	console.log(h);
-
 
 	console.log(options.responsive);
 	console.log(options.maintainAspectRatio);
@@ -430,7 +400,7 @@ export default function GraphStart() {
 		)}
 		</CSVReader>
 
-		<p>Choose the days you want displayed:</p>
+		<div classname="graph">		<p>Choose the days you want displayed:</p>
 		<div>
 		<input type="checkbox" id="Sun"></input>
 		<label for="Sun">Sunday</label>
@@ -475,6 +445,8 @@ export default function GraphStart() {
 
 		<p></p>
 		<button onClick={draw}>Draw Graph</button>
+
+		</div>
 		</>
 
 
