@@ -84,6 +84,7 @@
     "finalhandler": "^1.1.2",
     "forwarded": "^0.2.0",
     "fresh": "^0.5.2",
+    "fs": "^0.0.1-security",
     "fund": "^1.0.0",
     "get-stream": "^4.1.0",
     "glob-parent": "^5.1.2",

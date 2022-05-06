@@ -15,11 +15,11 @@ db.connectDB();
 app.get('/', (req, res) => res.send('Landing Page'));
 
 // Setup bodyParser for parsing JSON requests
-app.use(bodyParser.urlencoded({extended : true}));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({limit: '50mb', extended : true}));
 app.use(express.static(__dirname + '/client/src'));
 app.use("/api/users", users);
 app.use("/api/password-reset", passwordReset);
+app.use(bodyParser.json({limit: '50mb'}));
 
 // Homepage: Login page if no session, else redirect to user's dashboard
 app.get('/',(req,res) => {
@@ -79,11 +79,10 @@ app.post('/password-reset', (req, res) => {
 // Upload: try to upload a file to the user's uploads
 app.post('/upload', (req, res) => {
     console.log("\nAttempting to upload file");
-    console.log(JSON.stringify(req.body));
     var ret = db.uploadFile(JSON.stringify(req.body));
     ret.then(result => {
         sess = req.session;
-        sess.email = req.body.email;
+        //sess.email = req.body.email;
         res.send(result);
     })
 });
@@ -95,7 +94,7 @@ app.post('/fetch', (req, res) => {
     var ret = db.fetchData(JSON.stringify(req.body));
     ret.then(result => {
         sess = req.session;
-        sess.email = req.body.email;
+        console.log(result);
         res.send(result);
     })
 });

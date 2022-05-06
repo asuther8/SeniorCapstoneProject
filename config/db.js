@@ -132,8 +132,8 @@ const convertDate = async (date) => {
 }
 
 const fetchData = async (data) => {
-  var ret = false;
   const collection = "users";
+  console.log(data);
   try {
     await client.connect();
     const jsonData = JSON.parse(data);
@@ -141,72 +141,10 @@ const fetchData = async (data) => {
     const users = db.collection(collection);
     const user = await users.findOne({username: jsonData.username});
     if (user !== null) {
-      var result = csvtojson().fromFile("diabetes_data.csv").then(async source => {
-        await client.connect();
-        const jsonData = JSON.parse(data);
-        const db = client.db(database);
-        const users = db.collection(collection);
-        var arr = [];
-        for (var i = 0; i < source.length; i++){
-            var row = source[i];
-            var date = await convertDate(source[i]["Date"]);
-            var dataRow = "Data." + date;
-            source[i]["Date"] = date;
-            arr.push(row);
-        }
-
-        // Push timestamps to user's Data array and sort
-        try{          
-          await users.updateMany({username: jsonData.username},
-          {
-            $push: {
-              "Data": {
-                $each: arr,
-                $sort: {"Date": 1}
-              }
-            }
-          },
-          {
-            upsert: true
-          });     
-        } catch (err){
-          console.log(err);
-        }
-
-        users.aggregate([
-          { $match: { username: jsonData.username }},
-          { $unwind: '$Data' },
-          { $group: { _id: '$Data.Date', data: { $addToSet: '$Meta' }}}
-        ]);
-
-        /*
-        users.aggregate([
-          { $match: { username: jsonData.username }},
-          {'$addFields': {'Data.Date': {'$setUnion': ['$Data.Date', []]}}}
-        ])
-        */
-        
-        users.find({username: jsonData.username}).forEach(async(doc) => {
-          await doc.Data.forEach(async(d) => {
-            console.log(d["Date"]);
-            /*
-            if (last["Date"] === d["Date"]){
-              console.log("Removing " + last["Date"] + " which matches " + d["Date"]);
-              await users.updateOne({username: jsonData.username}, { $pull: { "Data": { Date: d["Date"]}}});
-            }
-            */
-          })
-        })
-        
-
-      }).catch(err => {
-        console.log(err);
-      }).finally(res => {
-        client.close();
-      })
-      if (result) ret = true;
-
-      console.log("Upload successful");
+      console.log("Found user " + jsonData.username)
+      return user;
+      const data = await users.findOne({username: jsonData.username});
+      console.log(data);
     } else {
       ret = false;
       console.log("Could not find username in database");
@@ -216,7 +154,7 @@ const fetchData = async (data) => {
   } finally {
     client.close();
   }
-  return ret;
+  return true;
 };
 
 const uploadFile = async (data) => {
@@ -228,8 +166,19 @@ const uploadFile = async (data) => {
     const db = client.db(database);
     const users = db.collection(collection);
     const user = await users.findOne({username: jsonData.username});
+    const fileData = jsonData.fileData.data;
+    var csv = "";
+    for (var i = 0; i < fileData.length; i++){
+      var count = 0;
+      for (var property in fileData[i]){
+        if (count === 9) csv += fileData[i][property] + "\n";
+        else csv += fileData[i][property] + ",";
+        count++;
+      }
+    }
+    console.log(csv);
     if (user !== null) {
-      var result = csvtojson().fromFile("diabetes_data.csv").then(async source => {
+      var result = csvtojson().fromString(csv).then(async source => {
         await client.connect();
         const jsonData = JSON.parse(data);
         const db = client.db(database);
@@ -276,7 +225,7 @@ const uploadFile = async (data) => {
         
         users.find({username: jsonData.username}).forEach(async(doc) => {
           await doc.Data.forEach(async(d) => {
-            console.log(d["Date"]);
+            //console.log(d["Date"]);
             /*
             if (last["Date"] === d["Date"]){
               console.log("Removing " + last["Date"] + " which matches " + d["Date"]);

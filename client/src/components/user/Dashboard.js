@@ -1,7 +1,7 @@
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "./Dashboard.css";
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 
 import { useCSVReader } from 'react-papaparse';
 
@@ -20,6 +20,7 @@ import {
 } from 'chart.js';
 
 import { Line } from 'react-chartjs-2';
+import { draw } from "../graph/dategraph";
 
 ChartJS.register(
 	CategoryScale,
@@ -35,17 +36,19 @@ const styles = {
 	csvReader: {
 		display: 'flex',
 		flexDirection: 'row',
-		marginBottom: 10
+		marginBottom: 10,
+		width: '40%',
+		
 	},
 	browseFile: {
 		width: '20%',
 	},
 	acceptedFile: {
 		border: '1px solid #ccc',
-		height: 45,
 		lineHeight: 2.5,
-		paddingLeft: 10,
-		width: '80%'
+		paddingLeft: 0,
+		width: '50%',
+		color: 'white'
 	},
 	remove: {
 		borderRadius: 0,
@@ -149,166 +152,168 @@ var labels = [];
 var tdat = [];
 var data = {};
 var lsize;
+const numHours = 24;
 
-//Draws the graph
-export function draw() {
-	var c1 = document.getElementById("Avg").checked;
-	var c2 = document.getElementById("Min").checked;
-	var c3 = document.getElementById("Max").checked;
-	console.log(c1);
-	var dsets = [];
-	var lset = labels;
-
-	var sub;
-	var glen;
-	var dval = document.getElementById("trange").options[document.getElementById("trange").selectedIndex].value;
-
-	//Determines how far back in the array the graph will start reading
-	if (dval == "1day") {
-		sub = 24;
-	}
-	else if (dval == "3day") {
-		sub = 72;
-	}
-	else if (dval == "1week") {
-		sub = 168;
-	}
-	else if (dval == "2week") {
-		sub = 336
-	}
-	else if (dval == "1month") {
-		sub = 720;
-	}
-	else if (dval == "2month") {
-		sub = 1440;
-	}
-	else if (dval == "3month") {
-		sub = 2160;
-	}
-
-	glen = lsize - sub;
-
-	if (glen < 0) {
-		alert("Not enough user data. Please select a shorter time span.");
-		return;
-	}
-
-	lset = lset.slice(glen, lsize);
-	console.log(lset);
-
-	//Data for the graph
-	var cavg = {
-		label: "Average",
-		data: arrayColumn(tdat, 3).slice(glen, lsize),
-		borderColor: 'rgb(255, 99, 132)',
-		backgroundColor: 'rgba(255, 99, 132, 0.5)'
-	};
-
-	var cmin = {
-		label: "Minimum",
-		data: arrayColumn(tdat, 4).slice(glen, lsize),
-		borderColor: 'rgb(99, 132, 255)',
-		backgroundColor: 'rgba(99, 132, 255, 0.5)'
-
-	};
-
-	var cmax = {
-		label: "Maximum",
-		data: arrayColumn(tdat, 8).slice(glen, lsize),
-		borderColor: 'rgb(132, 255, 99)',
-		backgroundColor: 'rgba(132, 255, 99, 0.5)'
-	};
-
-  /*
-	if (c1 != true && c2 != true && c3 != true) {
-		alert("Please check at least one data type.");
-		return;
-	}
-  */
-
-	//Adds the data to the graph's set if the appropriate checkbox is clicked
-	//if (c1) {
-		dsets.push(cavg);
-	//}
-
-	if (c2) {
-		dsets.push(cmin);
-	}
-
-	if (c3) {
-		dsets.push(cmax);
-	}
-
-	console.log(dsets);
-	data = {
-		labels: lset,
-		datasets: dsets
-	};
-
-	var w = window.innerWidth;
-	var h = window.innerHeight;
-
-	if (w < 1000) {
-		w = 1200;
-	  ReactDOM.render(<div id="gg" style={{height:"150%", width: "300%"}}><Line overflow-x={"hidden"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("graph"));
-	}
-
-	else {
-		ReactDOM.render(<div class="drawn" id="gg"><Line overflow-x={"hidden"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("graph"));
-	}
-
-	console.log(w);
-	console.log(h);
-
-	console.log(options.responsive);
-	console.log(options.maintainAspectRatio);
+const onFileUpload = async() => {
+	const username = localStorage.getItem('user');
+	let result = await fetch(
+	'http://localhost:8082/upload', {
+		method: "post",
+		body: JSON.stringify({ username }),
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		}
+	}).then(response => {
+	  if (response.ok) {
+		  return response.json();
+	  }
+	  throw response;
+	}).then(data => {
+	}).catch(error => {
+	  console.error(error);
+	}).finally(() => {
+	});
 };
 
-const fetchData = async (e) => {
-  const username = localStorage.getItem('user');
-  e.preventDefault();
-  let result = await fetch(
-  'http://localhost:8082/fetch', {
-      method: "post",
-      body: JSON.stringify({ username }),
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      }
-  }).then(response => {
-    if (response.ok) {
-        return response.json();
-    }
-    throw response;
-  }).then(data => {
-    if (data === false) {
-      alert("Bad username/password");
-      localStorage.setItem('user', false);
-    }
-    else {
-      //alert("Login successful");
-      window.location.replace("/dashboard");
-    }
-  }).catch(error => {
-    console.error(error);
-  }).finally(() => {
-  });
-}
-
-const getData = async(e) => {
-  e.preventDefault();
-  tdat = test;
-  labels = arrayColumn(test, 1);
-  labels = labels.slice(1, (labels.length - 1));
-  lsize = labels.length;
-  draw();
-}
-
-export default function Dashboard() {
-  const [email, setEmail] = useState("");
-  const [username, getUsername] = useState(localStorage.getItem('user'));
+const uploadFile = async(fileData) => {
+	console.log(fileData);
+	const username = localStorage.getItem('user');
+	let result = await fetch(
+	'http://localhost:8082/upload', {
+		method: "post",
+		body: JSON.stringify({ username, fileData }),
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		}
+	}).then(response => {
+	  if (response.ok) {
+		  return response.json();
+	  }
+	  throw response;
+	}).then(data => {
+	}).catch(error => {
+	  console.error(error);
+	}).finally(() => {
+	});
+};
   
+const Dashboard = () => {
 	const { CSVReader } = useCSVReader();
+	var [diabData, setData] = useState([]);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const username = localStorage.getItem('user');
+			let result = await fetch(
+			'http://localhost:8082/fetch', {
+				method: "post",
+				body: JSON.stringify({ username }),
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				}
+			}).then(response => {
+			  if (response.ok) {
+				  return response.json();
+			  }
+			  throw response;
+			}).then(data => {
+				if (data["Data"]){
+					setData(JSON.stringify(data["Data"]));
+				}
+			}).catch(error => {
+			    console.error(error);
+			}).finally(() => {
+			});
+		  }
+		  fetchData();
+	}, []);
+
+	console.log(diabData);
+	
+	if (diabData.length === 0) return (
+		<>
+		<div className="Dashboard"> 
+			<CSVReader
+				onUploadAccepted={(results: any) => {
+					uploadFile(results);
+				}}
+			>
+
+			{({
+				getRootProps,
+				acceptedFile,
+				ProgressBar,
+				getRemoveFileProps,
+			}: any) => (
+			<>
+			<div style={styles.csvReader}>
+				<button type='button' {...getRootProps()} style={styles.browseFile}>
+					Browse file
+				</button>
+				<div style={styles.acceptedFile}>
+					{acceptedFile && acceptedFile.name}
+				</div>
+			</div>
+			<ProgressBar style={styles.progressBarBackgroundColor} />
+			</>
+			)}
+			</CSVReader>
+		</div>
+		</>
+	);
+	
+	var parsedData = JSON.parse(diabData);
+	var count = 0;
+	var graphData = [];
+	for (var i = parsedData.length-2; count < numHours; i--){
+		if (parsedData[i]["Date"] === parsedData[i+1]["Date"]) continue;
+		if (count >= parsedData.length) break;
+		var arr = [];
+		for (var property in parsedData[i]){
+			// Convert timestamp YYYY-MM-DD hh:mm:ss to MM/DD/YYYY hh:mm (AM/PM)
+			// 11/01/2021 12:00 AM
+			if (property === "Date"){
+				var date = parsedData[i][property];
+				var year = date.slice(0, 4);
+				var month = date.slice(5, 7);
+				var day = date.slice(8, 10);
+				var hour = date.slice(11, 13);
+				var minute = date.slice(14, 16);
+				var hourInt = parseInt(hour);
+				var ampm = "";
+				if (hourInt === 0){
+					hour = "12";
+					ampm = "AM";
+				}
+				else if (hourInt === 12){
+					ampm = "PM";
+				}
+				else if (hourInt > 12){
+					hour = String(hourInt-12);
+					ampm = "PM";
+				}
+				else{
+					ampm = "AM";
+				}
+				var newDate = month + "/" + day + "/" + year + " " + hour + ":" + minute + " " + ampm;
+				arr.push(newDate);
+				continue;
+			}
+			arr.push(parsedData[i][property]);
+		}
+		graphData.push(arr);
+		count++;
+	}
+
+	tdat = graphData;
+	labels = arrayColumn(test, 1);
+	labels = labels.slice(1, (labels.length - 1));
+	lsize = labels.length;
+
+	//tempGetData();
 
 	var dsets = [];
 	var lset = labels;
@@ -324,7 +329,6 @@ export default function Dashboard() {
 	}
 
 	lset = lset.slice(glen, lsize);
-	console.log(lset);
 
 	//Data for the graph
 	var cavg = {
@@ -349,101 +353,50 @@ export default function Dashboard() {
 		backgroundColor: 'rgba(132, 255, 99, 0.5)'
 	};
 
-  /*
-	if (c1 != true && c2 != true && c3 != true) {
-		alert("Please check at least one data type.");
-		return;
-	}
-  */
+	dsets.push(cavg);
 
 	data = {
 		labels: lset,
 		datasets: dsets
 	};
 
-	var w = window.innerWidth;
-	var h = window.innerHeight;
-
-  /*
-	if (w < 1000) {
-		w = 1200;
-	  ReactDOM.render(<div id="gg" style={{height:"150%", width: "300%"}}><Line overflow-x={"hidden"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("graph"));
-	}
-
-	else {
-		ReactDOM.render(<div class="drawn" id="gg"><Line overflow-x={"hidden"} width={w} height={h} options={options} data={data} /></div>, document.getElementById("graph"));
-	}
-  */
-
   return (
     <>
-    <div className="Dashboard">
-      <Form onSubmit={getData}>
-        <Button block size="lg" type="submit">
-          Test
-        </Button>
-      </Form>
-		  
-      <CSVReader
-        onUploadAccepted={(results: any) => {
-          console.log('---------------------------');
-          console.log(results);
-          console.log('---------------------------');
-          console.log(results.data[1]);
-          tdat = results.data;
-          labels = arrayColumn(results.data, 1);
-          labels = labels.slice(1, (labels.length - 1));
-          lsize = labels.length;
-          //console.log(labels);
-        }}
-      >
+    <div className="Dashboard"> 
+		<CSVReader
+				onUploadAccepted={(results: any) => {
+					uploadFile(results);
+				}}
+			>
 
-        {({
-          getRootProps,
-        }: any) => (
-          <>
-          <div>
-            <button class="graph" type='file' {...getRootProps()} style={styles.browseFile}>
-              Upload
-            </button>
-          </div>
-          </>
-        )}
-      </CSVReader>
+			{({
+				getRootProps,
+				acceptedFile,
+				ProgressBar,
+				getRemoveFileProps,
+			}: any) => (
+			<>
+			<div style={styles.csvReader}>
+				<button type='button' {...getRootProps()} style={styles.browseFile}>
+					Browse file
+				</button>
+				<div style={styles.acceptedFile}>
+					{acceptedFile && acceptedFile.name}
+				</div>
+			</div>
+			<ProgressBar style={styles.progressBarBackgroundColor} />
+			</>
+			)}
+		</CSVReader>
 
-      <div class="graph" id="graph">
-        {ReactDOM.render(<div id="gg" style={{height:"150%", width: "300%"}}><Line overflow-x={"hidden"} width={window.innderWidth} height={window.innerHeight} options={options} data={data} /></div>, document.getElementById("graph"))}
-        <p>Choose your hourly data:</p>
-        <div>
-          <input type="checkbox" id="Avg"></input>
-          <label for="Avg">Average</label>
-        </div>
-
-        <div>
-          <input type="checkbox" id="Min"></input>
-          <label for="Min">Minimum</label>
-        </div>
-
-        <div>
-          <input type="checkbox" id="Max"></input>
-          <label for="Max">Maximum</label>
-        </div>
-
-        <p>Select a time range:</p>
-        <select id="trange">
-          <option value="1day">1 Day</option>
-          <option value="3day">3 Days</option>
-          <option value="1week">1 Week</option>
-          <option value="2week">2 Weeks</option>
-          <option value="1month">1 Month</option>
-          <option value="2month">2 Months</option>
-          <option value="3month">3 Months</option>
-        </select>
-
-        <p></p>
-        <button onClick={draw}>Draw Graph</button>
-      </div>
-    </div>
+		<div class="graph" id="graph">
+        	<div class="drawn" id="gg" style={{height:"150%", width: "300%"}}>
+	  			<Line overflow-x={"hidden"} width={window.innerWidth} height={window.innerHeight} options={options} data={data}/>
+    		</div>
+    	</div>
+	</div>
     </>
   );
 }
+
+export default Dashboard;
